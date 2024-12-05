@@ -1,16 +1,14 @@
 import { BrandForm } from '../../components/brands/brand-form';
 import BrandsTable from '../../components/brands/brands-table';
 import { Header } from '../../components/header';
+import QueryClientProvider from '../../providers/query-client-provider';
 import { defineRouteConfig } from '@medusajs/admin-sdk';
 import { TagSolid } from '@medusajs/icons';
 import { Container } from '@medusajs/ui';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
 
 const BrandsPage = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider>
       <Container className="divide-y p-0">
         <Header
           title="Brands"

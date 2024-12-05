@@ -2,21 +2,19 @@ import { StepResponse, WorkflowResponse, createStep, createWorkflow } from '@med
 import { BRAND_MODULE } from 'src/modules/brand';
 import BrandModuleService from 'src/modules/brand/service';
 
-export type CreateBrandInput = {
-  name: string;
-  description?: string;
+export type DeleteBrandInput = {
+  id: string;
 };
 
-export const createBrandStep = createStep(
+export const deleteBrandStep = createStep(
   // step name
-  'create-brand-step',
+  'delete-brand-step',
   // step handler
-  async ({ name, description }: CreateBrandInput, { container }) => {
+  async ({ id }: DeleteBrandInput, { container }) => {
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
 
-    const brand = await brandModuleService.createBrands({
-      name,
-      description,
+    const brand = await brandModuleService.softDeleteBrands({
+      id,
     });
 
     return new StepResponse(brand, brand);
@@ -24,12 +22,11 @@ export const createBrandStep = createStep(
   // rollback when the step fails
   async (brand, { container }) => {
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
-
-    return brandModuleService.deleteBrands(brand.id);
+    // ??
   }
 );
 
-export const createBrandWorkflow = createWorkflow('create-brand', (input: CreateBrandInput) => {
-  const brand = createBrandStep(input);
+export const deleteBrandWorkflow = createWorkflow('delete-brand', (input: DeleteBrandInput) => {
+  const brand = deleteBrandStep(input);
   return new WorkflowResponse(brand);
 });

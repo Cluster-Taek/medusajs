@@ -5,19 +5,16 @@ import * as zod from 'zod';
 
 const schema = zod.object({
   name: zod.string(),
+  description: zod.string().optional(),
 });
 
 export const BrandForm = () => {
-  const form = useForm<zod.infer<typeof schema>>({
-    defaultValues: {
-      name: '',
-    },
-  });
+  const form = useForm<zod.infer<typeof schema>>();
 
   const { mutate: createBrand } = useCreateBrand();
 
-  const handleSubmit = form.handleSubmit(async ({ name }) => {
-    createBrand(name, {
+  const handleSubmit = form.handleSubmit(async (value) => {
+    createBrand(value, {
       onSuccess: () => {
         form.reset();
       },
@@ -55,7 +52,25 @@ export const BrandForm = () => {
                           <div className="flex flex-col space-y-2">
                             <div className="flex items-center gap-x-1">
                               <Label size="small" weight="plus">
-                                Title
+                                Name
+                              </Label>
+                            </div>
+                            <Input {...field} />
+                          </div>
+                        );
+                      }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Controller
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => {
+                        return (
+                          <div className="flex flex-col space-y-2">
+                            <div className="flex items-center gap-x-1">
+                              <Label size="small" weight="plus">
+                                Description
                               </Label>
                             </div>
                             <Input {...field} />
