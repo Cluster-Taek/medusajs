@@ -31,10 +31,11 @@ export const useBrands = (params?: IBrandsParams) => {
   });
 };
 
-export const useBrand = (id: string) => {
+export const useBrand = (id?: string) => {
   return useQuery<IBrand>({
     queryFn: () => fetch(`/admin/brands/${id}`).then((res) => res.json()),
     queryKey: ['brands', id],
+    enabled: !!id,
   });
 };
 
