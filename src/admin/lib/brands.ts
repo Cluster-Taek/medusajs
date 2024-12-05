@@ -1,3 +1,4 @@
+import { ProductDTO } from '@medusajs/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface IBrand extends Record<string, unknown> {
@@ -7,7 +8,7 @@ export interface IBrand extends Record<string, unknown> {
   created_at: string;
 }
 
-export interface IBrandsParams {
+export interface IPagingParams {
   limit?: number;
   page?: number;
 }
@@ -18,12 +19,19 @@ export interface IBrandsResponse {
   page: number;
 }
 
+export interface IBrandProductsResponse {
+  products: ProductDTO[];
+  count: number;
+  limit: number;
+  page: number;
+}
+
 export interface IBrandFormValues {
   name: string;
   description?: string;
 }
 
-export const useBrands = (params?: IBrandsParams) => {
+export const useBrands = (params?: IPagingParams) => {
   const requestParams = new URLSearchParams(params as any).toString();
   return useQuery<IBrandsResponse>({
     queryFn: () => fetch(`/admin/brands?${requestParams}`).then((res) => res.json()),
@@ -35,6 +43,15 @@ export const useBrand = (id?: string) => {
   return useQuery<IBrand>({
     queryFn: () => fetch(`/admin/brands/${id}`).then((res) => res.json()),
     queryKey: ['brands', id],
+    enabled: !!id,
+  });
+};
+
+export const useBrandProducts = (id?: string, params?: IPagingParams) => {
+  const requestParams = new URLSearchParams(params as any).toString();
+  return useQuery<IBrandProductsResponse>({
+    queryFn: () => fetch(`/admin/brands/${id}/products?${requestParams}`).then((res) => res.json()),
+    queryKey: ['brands', id, 'products', params],
     enabled: !!id,
   });
 };

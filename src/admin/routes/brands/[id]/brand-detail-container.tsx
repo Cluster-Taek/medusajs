@@ -41,7 +41,7 @@ const BrandDetailContainer = ({ id }: IBrandDetailContainerProps) => {
   return (
     <Container className="p-0 divide-y">
       <Header
-        title="Brand Detail Widget"
+        title={brand?.name ?? 'Brand Detail'}
         actions={[
           {
             type: 'action-menu',

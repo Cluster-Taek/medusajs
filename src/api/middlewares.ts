@@ -1,5 +1,6 @@
 import { PostAdminCreateBrand } from './admin/brands/validators';
 import { defineMiddlewares, validateAndTransformBody } from '@medusajs/framework/http';
+import { z } from 'zod';
 
 export default defineMiddlewares({
   routes: [
@@ -7,6 +8,13 @@ export default defineMiddlewares({
       matcher: '/admin/brands',
       method: 'POST',
       middlewares: [validateAndTransformBody(PostAdminCreateBrand)],
+    },
+    {
+      matcher: '/admin/products',
+      method: ['POST'],
+      additionalDataValidator: {
+        brand_id: z.string().optional(),
+      },
     },
   ],
 });

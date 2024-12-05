@@ -1,9 +1,9 @@
 import { Table as UiTable } from '@medusajs/ui';
 import { useMemo } from 'react';
 
-interface TableProps<T> {
+interface TableProps<T extends Object> {
   columns: {
-    key: string;
+    key: keyof T;
     label?: string;
     width?: string;
     align?: 'left' | 'right' | 'center';
@@ -17,7 +17,7 @@ interface TableProps<T> {
   onClickRow?: (item: T) => void;
 }
 
-export const Table = <T extends Record<string, unknown>>({
+export const Table = <T extends Object>({
   columns,
   data,
   pageSize,

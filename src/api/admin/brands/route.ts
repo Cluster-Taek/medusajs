@@ -23,8 +23,8 @@ export async function POST(req: MedusaRequest<PostAdminCreateBrandType>, res: Me
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const brandModuleService: BrandModuleService = req.scope.resolve(BRAND_MODULE);
 
-  const limit = Number(req.query.limit) ?? 10;
-  const page = Number(req.query.page) ?? 0;
+  const limit = req.query.limit ? Number(req.query.limit) : 10;
+  const page = req.query.page ? Number(req.query.page) : 0;
 
   const [brands, count] = await brandModuleService.listAndCountBrands(
     {},
