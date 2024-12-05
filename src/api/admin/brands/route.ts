@@ -1,15 +1,13 @@
+import { PostAdminCreateBrand } from './validators';
 import type { MedusaRequest, MedusaResponse } from '@medusajs/framework/http';
 import { BRAND_MODULE } from 'src/modules/brand';
 import BrandModuleService from 'src/modules/brand/service';
 import { createBrandWorkflow } from 'src/workflows/create-brand';
-import { deleteBrandWorkflow } from 'src/workflows/delete-brand';
+import { z } from 'zod';
 
-interface CreateBrandInput {
-  name: string;
-  description?: string;
-}
+type PostAdminCreateBrandType = z.infer<typeof PostAdminCreateBrand>;
 
-export async function POST(req: MedusaRequest<CreateBrandInput>, res: MedusaResponse) {
+export async function POST(req: MedusaRequest<PostAdminCreateBrandType>, res: MedusaResponse) {
   const { result: brand } = await createBrandWorkflow(req.scope).run({
     input: {
       name: req.body.name,

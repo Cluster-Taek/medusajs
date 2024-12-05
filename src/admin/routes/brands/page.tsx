@@ -9,7 +9,7 @@ import { Container } from '@medusajs/ui';
 const BrandsPage = () => {
   return (
     <QueryClientProvider>
-      <Container className="divide-y p-0">
+      <Container className="p-0 divide-y">
         <Header
           title="Brands"
           subtitle="This is my brands page"
