@@ -32,14 +32,3 @@ export const POST = async (req: MedusaRequest<LinkBrandToProductType>, res: Medu
 
   res.json({ link });
 };
-
-export const DELETE = async (req: MedusaRequest<LinkBrandToProductType>, res: MedusaResponse) => {
-  const { result: link } = await linkProductsToBrandWorkflow(req.scope).run({
-    input: {
-      productIds: [req.params.id],
-      brandId: req.body.brandId,
-    },
-  });
-
-  res.json({ link });
-};

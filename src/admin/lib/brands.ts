@@ -134,3 +134,26 @@ export const useLinkProductsToBrand = (brandId?: string) => {
     },
   });
 };
+
+export const useDismissProductsToBrand = (brandId?: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (value: { productIds: string[] }) =>
+      fetch(`/admin/brands/${brandId}/products`, {
+        method: 'DELETE',
+        body: JSON.stringify(value),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['brands', brandId, 'products'],
+        refetchType: 'all',
+      });
+    },
+    onError: (error) => {
+      throw new Error(error.message);
+    },
+  });
+};

@@ -30,6 +30,7 @@ export const BrandProductFocusModal = ({ id }: IBrandProductFocusModalProps) => 
     linkProductsToBrand(value, {
       onSuccess: () => {
         form.reset();
+        navigate(`/brands/${id}`);
       },
       onError: (error) => {
         console.error(error);

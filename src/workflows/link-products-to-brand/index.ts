@@ -36,13 +36,16 @@ export const linkProductsToBrandStep = createStep(
   async ({ productIds, brandId }, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
 
-    remoteLink.dismiss({
-      [Modules.PRODUCT]: {
-        product_id: productIds,
-      },
-      [BRAND_MODULE]: {
-        brand_id: brandId,
-      },
+    // TODO: bulk create
+    productIds.forEach(async (productId) => {
+      await remoteLink.dismiss({
+        [Modules.PRODUCT]: {
+          product_id: productId,
+        },
+        [BRAND_MODULE]: {
+          brand_id: brandId,
+        },
+      });
     });
   }
 );

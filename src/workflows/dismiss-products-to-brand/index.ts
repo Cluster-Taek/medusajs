@@ -4,7 +4,7 @@ import { StepResponse, WorkflowResponse, createStep, createWorkflow } from '@med
 import BrandModuleService from 'src/modules/brand/service';
 
 type DismissProductsToBrandStepInput = {
-  productIds: string;
+  productIds: string[];
   brandId: string;
 };
 
@@ -16,13 +16,16 @@ export const dismissProductsToBrandStep = createStep(
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
     await brandModuleService.retrieveBrand(brandId);
 
-    await remoteLink.dismiss({
-      [Modules.PRODUCT]: {
-        product_id: productIds,
-      },
-      [BRAND_MODULE]: {
-        brand_id: brandId,
-      },
+    // TODO: bulk create
+    productIds.forEach(async (productId) => {
+      await remoteLink.dismiss({
+        [Modules.PRODUCT]: {
+          product_id: productId,
+        },
+        [BRAND_MODULE]: {
+          brand_id: brandId,
+        },
+      });
     });
 
     return new StepResponse(undefined, {
@@ -33,13 +36,16 @@ export const dismissProductsToBrandStep = createStep(
   async ({ productIds, brandId }, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
 
-    remoteLink.create({
-      [Modules.PRODUCT]: {
-        product_id: productIds,
-      },
-      [BRAND_MODULE]: {
-        brand_id: brandId,
-      },
+    // TODO: bulk create
+    productIds.forEach(async (productId) => {
+      await remoteLink.create({
+        [Modules.PRODUCT]: {
+          product_id: productId,
+        },
+        [BRAND_MODULE]: {
+          brand_id: brandId,
+        },
+      });
     });
   }
 );
