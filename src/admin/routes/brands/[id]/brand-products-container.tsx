@@ -1,9 +1,10 @@
 import { Header } from '../../../components/header';
+import ProductStatusBadge from '../../../components/products/product-status-badge';
 import { Table } from '../../../components/table';
 import { useBrandProducts } from '../../../lib/brands';
-import { Pencil } from '@medusajs/icons';
-import { ProductDTO, ProductStatus } from '@medusajs/types';
-import { Container, StatusBadge } from '@medusajs/ui';
+import { Plus } from '@medusajs/icons';
+import { ProductDTO } from '@medusajs/types';
+import { Container } from '@medusajs/ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,14 +18,7 @@ const BrandProductsContainer = ({ id }: IBrandProductsContainerProps) => {
   const navigate = useNavigate();
 
   const handleClickedEdit = () => {
-    navigate(`/brands/${id}/edit`);
-  };
-
-  const getProductStatusBadge = (status: ProductStatus) => {
-    if (status === 'draft') return <StatusBadge color="grey">Draft</StatusBadge>;
-    if (status === 'published') return <StatusBadge color="green">Published</StatusBadge>;
-    if (status === 'proposed') return <StatusBadge color="grey">Proposed</StatusBadge>;
-    if (status === 'rejected') return <StatusBadge color="red">Rejected</StatusBadge>;
+    navigate(`/brands/${id}/products`);
   };
 
   return (
@@ -39,8 +33,8 @@ const BrandProductsContainer = ({ id }: IBrandProductsContainerProps) => {
                 {
                   actions: [
                     {
-                      icon: <Pencil />,
-                      label: 'Edit',
+                      icon: <Plus />,
+                      label: 'Add',
                       onClick: handleClickedEdit,
                     },
                   ],
@@ -90,7 +84,7 @@ const BrandProductsContainer = ({ id }: IBrandProductsContainerProps) => {
           {
             key: 'status',
             label: 'Status',
-            render: (value: any) => getProductStatusBadge(value),
+            render: (value: any) => <ProductStatusBadge status={value} />,
           },
         ]}
         data={data?.products ?? []}

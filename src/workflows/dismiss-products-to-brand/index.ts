@@ -3,22 +3,22 @@ import { ContainerRegistrationKeys, Modules } from '@medusajs/framework/utils';
 import { StepResponse, WorkflowResponse, createStep, createWorkflow } from '@medusajs/framework/workflows-sdk';
 import BrandModuleService from 'src/modules/brand/service';
 
-type LinkProductToBrandStepInput = {
-  productId: string;
+type DismissProductsToBrandStepInput = {
+  productIds: string;
   brandId: string;
 };
 
-export const linkProductToBrandStep = createStep(
-  'link-product-to-brand',
-  async ({ productId, brandId }: LinkProductToBrandStepInput, { container }) => {
+export const dismissProductsToBrandStep = createStep(
+  'dismiss-products-to-brand',
+  async ({ productIds, brandId }: DismissProductsToBrandStepInput, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
 
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
     await brandModuleService.retrieveBrand(brandId);
 
-    await remoteLink.create({
+    await remoteLink.dismiss({
       [Modules.PRODUCT]: {
-        product_id: productId,
+        product_id: productIds,
       },
       [BRAND_MODULE]: {
         brand_id: brandId,
@@ -26,16 +26,16 @@ export const linkProductToBrandStep = createStep(
     });
 
     return new StepResponse(undefined, {
-      productId,
+      productIds,
       brandId,
     });
   },
-  async ({ productId, brandId }, { container }) => {
+  async ({ productIds, brandId }, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
 
-    remoteLink.dismiss({
+    remoteLink.create({
       [Modules.PRODUCT]: {
-        product_id: productId,
+        product_id: productIds,
       },
       [BRAND_MODULE]: {
         brand_id: brandId,
@@ -44,10 +44,10 @@ export const linkProductToBrandStep = createStep(
   }
 );
 
-export const linkProductToBrandWorkflow = createWorkflow(
-  'link-product-to-brand',
-  (input: LinkProductToBrandStepInput) => {
-    const link = linkProductToBrandStep(input);
+export const dismissProductsToBrandWorkflow = createWorkflow(
+  'dismiss-products-to-brand',
+  (input: DismissProductsToBrandStepInput) => {
+    const link = dismissProductsToBrandStep(input);
     return new WorkflowResponse(link);
   }
 );

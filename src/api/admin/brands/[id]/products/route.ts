@@ -1,5 +1,8 @@
+import { LinkProductsToBrand } from './validators';
 import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http';
 import { ContainerRegistrationKeys } from '@medusajs/framework/utils';
+import { linkProductsToBrandWorkflow } from 'src/workflows/link-products-to-brand';
+import { z } from 'zod';
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY);
@@ -31,4 +34,17 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     limit,
     page,
   });
+};
+
+type LinkProductsToBrand = z.infer<typeof LinkProductsToBrand>;
+
+export const POST = async (req: MedusaRequest<LinkProductsToBrand>, res: MedusaResponse) => {
+  const { result: link } = await linkProductsToBrandWorkflow(req.scope).run({
+    input: {
+      brandId: req.params.id,
+      productIds: req.body.productIds,
+    },
+  });
+
+  res.json({ link });
 };

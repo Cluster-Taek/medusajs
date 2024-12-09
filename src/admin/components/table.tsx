@@ -1,7 +1,10 @@
-import { Table as UiTable } from '@medusajs/ui';
-import { useMemo } from 'react';
+import { Checkbox, Table as UiTable } from '@medusajs/ui';
+import { useEffect, useMemo, useState } from 'react';
 
-interface TableProps<T extends Object> {
+interface ObjectWithId extends Object {
+  id: string;
+}
+interface TableProps<T extends ObjectWithId> {
   columns: {
     key: keyof T;
     label?: string;
@@ -15,9 +18,12 @@ interface TableProps<T extends Object> {
   currentPage: number;
   setCurrentPage: (value: number) => void;
   onClickRow?: (item: T) => void;
+  selectable?: boolean;
+  defaultSelected?: T[];
+  onSelectChange?: (selected: T[]) => void;
 }
 
-export const Table = <T extends Object>({
+export const Table = <T extends ObjectWithId>({
   columns,
   data,
   pageSize,
@@ -25,7 +31,11 @@ export const Table = <T extends Object>({
   currentPage,
   setCurrentPage,
   onClickRow,
+  selectable,
+  defaultSelected,
+  onSelectChange,
 }: TableProps<T>) => {
+  const [selected, setSelected] = useState<T[]>([]);
   const pageCount = useMemo(() => {
     return Math.ceil(count / pageSize);
   }, [data, pageSize]);
@@ -49,11 +59,37 @@ export const Table = <T extends Object>({
     }
   };
 
+  useEffect(() => {
+    setSelected(defaultSelected ?? []);
+  }, [defaultSelected]);
+
+  useEffect(() => {
+    onSelectChange?.(selected);
+  }, [selected]);
+
   return (
     <div className="flex h-full flex-col overflow-hidden !border-t-0">
       <UiTable>
         <UiTable.Header>
           <UiTable.Row>
+            {selectable && (
+              <UiTable.HeaderCell
+                style={{
+                  width: '40px',
+                }}
+              >
+                <Checkbox
+                  checked={selected.length === data.length}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelected(data);
+                    } else {
+                      setSelected(defaultSelected ?? []);
+                    }
+                  }}
+                />
+              </UiTable.HeaderCell>
+            )}
             {columns.map((column, index) => (
               <UiTable.HeaderCell key={index}>{column.label}</UiTable.HeaderCell>
             ))}
@@ -68,6 +104,21 @@ export const Table = <T extends Object>({
                 onClick={() => onClickRow?.(item)}
                 className={`${onClickRow && 'cursor-pointer'}`}
               >
+                {selectable && (
+                  <UiTable.Cell>
+                    <Checkbox
+                      checked={selected.some((i) => i.id === item.id)}
+                      disabled={defaultSelected?.some((i) => i.id === item.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelected([...selected, item]);
+                        } else {
+                          setSelected(selected.filter((i) => i !== item));
+                        }
+                      }}
+                    />
+                  </UiTable.Cell>
+                )}
                 {columns.map((column, index) => (
                   <UiTable.Cell
                     key={`${rowIndex}-${index}`}
@@ -81,7 +132,7 @@ export const Table = <T extends Object>({
                     }}
                   >
                     <>
-                      {column.render && column.render(item[column.key] as T[keyof T], item)}
+                      {column.render && column.render(item[column.key] as any, item)}
                       {!column.render && <>{item[column.key] as string}</>}
                     </>
                   </UiTable.Cell>

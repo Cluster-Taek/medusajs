@@ -1,3 +1,4 @@
+import { IPagingParams, IPagingResponse } from '../types/paging';
 import { ProductDTO } from '@medusajs/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -8,22 +9,12 @@ export interface IBrand extends Record<string, unknown> {
   created_at: string;
 }
 
-export interface IPagingParams {
-  limit?: number;
-  page?: number;
-}
-export interface IBrandsResponse {
+export interface IBrandsResponse extends IPagingResponse {
   brands: IBrand[];
-  count: number;
-  limit: number;
-  page: number;
 }
 
-export interface IBrandProductsResponse {
+export interface IBrandProductsResponse extends IPagingResponse {
   products: ProductDTO[];
-  count: number;
-  limit: number;
-  page: number;
 }
 
 export interface IBrandFormValues {
@@ -112,6 +103,29 @@ export const useDeleteBrand = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['brands'],
+        refetchType: 'all',
+      });
+    },
+    onError: (error) => {
+      throw new Error(error.message);
+    },
+  });
+};
+
+export const useLinkProductsToBrand = (brandId?: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (value: { productIds: string[] }) =>
+      fetch(`/admin/brands/${brandId}/products`, {
+        method: 'POST',
+        body: JSON.stringify(value),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['brands', brandId, 'products'],
         refetchType: 'all',
       });
     },

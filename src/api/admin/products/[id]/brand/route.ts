@@ -1,7 +1,7 @@
-import { LinkProductToBrand } from './validators';
+import { LinkBrandToProduct } from './validators';
 import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http';
 import { ContainerRegistrationKeys } from '@medusajs/framework/utils';
-import { linkProductToBrandWorkflow } from 'src/workflows/link-product-to-brand';
+import { linkProductsToBrandWorkflow } from 'src/workflows/link-products-to-brand';
 import { z } from 'zod';
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -20,12 +20,12 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   res.json({ brand: product.brand });
 };
 
-type LinkProductToBrandType = z.infer<typeof LinkProductToBrand>;
+type LinkBrandToProductType = z.infer<typeof LinkBrandToProduct>;
 
-export const POST = async (req: MedusaRequest<LinkProductToBrandType>, res: MedusaResponse) => {
-  const { result: link } = await linkProductToBrandWorkflow(req.scope).run({
+export const POST = async (req: MedusaRequest<LinkBrandToProductType>, res: MedusaResponse) => {
+  const { result: link } = await linkProductsToBrandWorkflow(req.scope).run({
     input: {
-      productId: req.params.id,
+      productIds: [req.params.id],
       brandId: req.body.brandId,
     },
   });
@@ -33,10 +33,10 @@ export const POST = async (req: MedusaRequest<LinkProductToBrandType>, res: Medu
   res.json({ link });
 };
 
-export const DELETE = async (req: MedusaRequest<LinkProductToBrandType>, res: MedusaResponse) => {
-  const { result: link } = await linkProductToBrandWorkflow(req.scope).run({
+export const DELETE = async (req: MedusaRequest<LinkBrandToProductType>, res: MedusaResponse) => {
+  const { result: link } = await linkProductsToBrandWorkflow(req.scope).run({
     input: {
-      productId: req.params.id,
+      productIds: [req.params.id],
       brandId: req.body.brandId,
     },
   });

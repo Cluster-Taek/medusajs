@@ -1,5 +1,5 @@
 import { z } from 'zod';
 
-export const LinkProductToBrand = z.object({
+export const LinkBrandToProduct = z.object({
   brandId: z.string(),
 });
