@@ -1,3 +1,4 @@
+import { ExclamationCircle } from '@medusajs/icons';
 import { Checkbox, Table as UiTable } from '@medusajs/ui';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -79,6 +80,7 @@ export const Table = <T extends ObjectWithId>({
                 }}
               >
                 <Checkbox
+                  disabled={data?.length === 0}
                   checked={selected.length === data.length}
                   onCheckedChange={(checked) => {
                     if (checked) {
@@ -142,6 +144,17 @@ export const Table = <T extends ObjectWithId>({
           })}
         </UiTable.Body>
       </UiTable>
+      {data.length === 0 && (
+        <div className="flex h-[200px] w-full flex-col items-center justify-center gap-y-4">
+          <div className="flex flex-col items-center gap-y-3">
+            <ExclamationCircle />
+            <div className="flex flex-col items-center gap-y-1">
+              <p className="font-sans font-medium txt-compact-small">No records</p>
+              <p className="font-sans font-normal txt-small text-ui-fg-muted">There are no records to show</p>
+            </div>
+          </div>
+        </div>
+      )}
       <UiTable.Pagination
         count={count}
         pageSize={pageSize}
