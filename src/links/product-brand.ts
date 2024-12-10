@@ -11,6 +11,7 @@ export default defineLink(
   {
     database: {
       table: 'product_brands',
+      idPrefix: 'pb',
     },
   }
 );

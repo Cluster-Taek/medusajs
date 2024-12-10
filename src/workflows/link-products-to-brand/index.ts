@@ -12,32 +12,45 @@ export const linkProductsToBrandStep = createStep(
   'link-products-to-brand',
   async ({ productIds, brandId }: LinkProductsToBrandStepInput, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
+    const query = container.resolve(ContainerRegistrationKeys.QUERY);
 
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
     await brandModuleService.retrieveBrand(brandId);
 
+    // https://docs.medusajs.com/learn/fundamentals/workflows/compensation-function#handle-errors-in-loops
     try {
       const productModuleService = container.resolve(Modules.PRODUCT);
       await promiseAll(
         productIds.map(async (productId) => {
           await productModuleService.retrieveProduct(productId);
+          const {
+            data: [product],
+          } = await query.graph({
+            entity: 'product',
+            fields: ['brand.*'],
+            filters: {
+              id: productId,
+            },
+          });
+          if (product.brand) {
+            throw new Error(`Product ${productId} already has a brand`);
+          }
         })
       );
     } catch (error) {
       return StepResponse.permanentFailure(error.message);
     }
 
-    // TODO: bulk create
-    productIds.forEach(async (productId) => {
-      await remoteLink.create({
+    await remoteLink.create(
+      productIds.map((productId) => ({
         [Modules.PRODUCT]: {
           product_id: productId,
         },
         [BRAND_MODULE]: {
           brand_id: brandId,
         },
-      });
-    });
+      }))
+    );
 
     return new StepResponse(undefined, {
       productIds,
@@ -47,17 +60,16 @@ export const linkProductsToBrandStep = createStep(
   async ({ productIds, brandId }, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
 
-    // TODO: bulk create
-    productIds.forEach(async (productId) => {
-      await remoteLink.dismiss({
+    await remoteLink.dismiss(
+      productIds.map((productId) => ({
         [Modules.PRODUCT]: {
           product_id: productId,
         },
         [BRAND_MODULE]: {
           brand_id: brandId,
         },
-      });
-    });
+      }))
+    );
   }
 );
 

@@ -18,7 +18,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     },
   });
 
-  res.json({ brand: product.brand });
+  res.json(product.brand);
 };
 
 type LinkBrandToProductType = z.infer<typeof LinkBrandToProduct>;

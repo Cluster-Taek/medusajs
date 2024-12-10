@@ -16,6 +16,7 @@ export const dismissProductsToBrandStep = createStep(
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
     await brandModuleService.retrieveBrand(brandId);
 
+    // https://docs.medusajs.com/learn/fundamentals/workflows/compensation-function#handle-errors-in-loops
     try {
       const productModuleService = container.resolve(Modules.PRODUCT);
       await promiseAll(
@@ -26,17 +27,17 @@ export const dismissProductsToBrandStep = createStep(
     } catch (error) {
       return StepResponse.permanentFailure(error.message);
     }
-    // TODO: bulk create
-    productIds.forEach(async (productId) => {
-      await remoteLink.dismiss({
+
+    await remoteLink.dismiss(
+      productIds.map((productId) => ({
         [Modules.PRODUCT]: {
           product_id: productId,
         },
         [BRAND_MODULE]: {
           brand_id: brandId,
         },
-      });
-    });
+      }))
+    );
 
     return new StepResponse(undefined, {
       productIds,
@@ -46,17 +47,16 @@ export const dismissProductsToBrandStep = createStep(
   async ({ productIds, brandId }, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
 
-    // TODO: bulk create
-    productIds.forEach(async (productId) => {
-      await remoteLink.create({
+    await remoteLink.create(
+      productIds.map((productId) => ({
         [Modules.PRODUCT]: {
           product_id: productId,
         },
         [BRAND_MODULE]: {
           brand_id: brandId,
         },
-      });
-    });
+      }))
+    );
   }
 );
 
