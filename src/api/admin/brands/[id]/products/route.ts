@@ -40,23 +40,37 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 type LinkProductsToBrand = z.infer<typeof LinkProductsToBrand>;
 
 export const POST = async (req: MedusaRequest<LinkProductsToBrand>, res: MedusaResponse) => {
-  const { result: link } = await linkProductsToBrandWorkflow(req.scope).run({
+  const { result: link, errors } = await linkProductsToBrandWorkflow(req.scope).run({
     input: {
       brandId: req.params.id,
       productIds: req.body.productIds,
     },
+    throwOnError: false,
   });
+
+  if (errors.length) {
+    return res.send({
+      errors: errors.map((error) => error.error.message),
+    });
+  }
 
   res.json({ link });
 };
 
 export const DELETE = async (req: MedusaRequest<LinkProductsToBrand>, res: MedusaResponse) => {
-  const { result: link } = await dismissProductsToBrandWorkflow(req.scope).run({
+  const { result: link, errors } = await dismissProductsToBrandWorkflow(req.scope).run({
     input: {
       brandId: req.params.id,
       productIds: req.body.productIds,
     },
+    throwOnError: false,
   });
+
+  if (errors.length) {
+    return res.send({
+      errors: errors.map((error) => error.error.message),
+    });
+  }
 
   res.json({ link });
 };

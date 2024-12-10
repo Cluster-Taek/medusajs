@@ -1,5 +1,5 @@
 import { BRAND_MODULE } from '../../modules/brand';
-import { ContainerRegistrationKeys, Modules } from '@medusajs/framework/utils';
+import { ContainerRegistrationKeys, Modules, promiseAll } from '@medusajs/framework/utils';
 import { StepResponse, WorkflowResponse, createStep, createWorkflow } from '@medusajs/framework/workflows-sdk';
 import BrandModuleService from 'src/modules/brand/service';
 
@@ -16,6 +16,16 @@ export const dismissProductsToBrandStep = createStep(
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
     await brandModuleService.retrieveBrand(brandId);
 
+    try {
+      const productModuleService = container.resolve(Modules.PRODUCT);
+      await promiseAll(
+        productIds.map(async (productId) => {
+          await productModuleService.retrieveProduct(productId);
+        })
+      );
+    } catch (error) {
+      return StepResponse.permanentFailure(error.message);
+    }
     // TODO: bulk create
     productIds.forEach(async (productId) => {
       await remoteLink.dismiss({
