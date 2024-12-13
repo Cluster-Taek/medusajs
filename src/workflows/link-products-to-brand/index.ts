@@ -17,6 +17,8 @@ export const linkProductsToBrandStep = createStep(
     const brandModuleService: BrandModuleService = container.resolve(BRAND_MODULE);
     await brandModuleService.retrieveBrand(brandId);
 
+    const previousLinks: { brandId: string; productId: string }[] = [];
+
     // https://docs.medusajs.com/learn/fundamentals/workflows/compensation-function#handle-errors-in-loops
     try {
       const productModuleService = container.resolve(Modules.PRODUCT);
@@ -33,7 +35,18 @@ export const linkProductsToBrandStep = createStep(
             },
           });
           if (product.brand) {
-            throw new Error(`Product ${productId} already has a brand`);
+            previousLinks.push({
+              brandId: product.brand.id,
+              productId,
+            });
+            await remoteLink.dismiss({
+              [Modules.PRODUCT]: {
+                product_id: productId,
+              },
+              [BRAND_MODULE]: {
+                brand_id: product.brand.id,
+              },
+            });
           }
         })
       );
@@ -55,13 +68,23 @@ export const linkProductsToBrandStep = createStep(
     return new StepResponse(undefined, {
       productIds,
       brandId,
+      previousLinks,
     });
   },
-  async ({ productIds, brandId }, { container }) => {
+  async ({ productIds, brandId, previousLinks }, { container }) => {
     const remoteLink = container.resolve(ContainerRegistrationKeys.REMOTE_LINK);
-
     await remoteLink.dismiss(
       productIds.map((productId) => ({
+        [Modules.PRODUCT]: {
+          product_id: productId,
+        },
+        [BRAND_MODULE]: {
+          brand_id: brandId,
+        },
+      }))
+    );
+    await remoteLink.create(
+      previousLinks.map(({ productId, brandId }) => ({
         [Modules.PRODUCT]: {
           product_id: productId,
         },

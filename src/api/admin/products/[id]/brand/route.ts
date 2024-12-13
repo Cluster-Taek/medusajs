@@ -18,7 +18,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     },
   });
 
-  res.json(product.brand);
+  res.json(product.brand ?? {});
 };
 
 type LinkBrandToProductType = z.infer<typeof LinkBrandToProduct>;
@@ -33,7 +33,7 @@ export const POST = async (req: MedusaRequest<LinkBrandToProductType>, res: Medu
   });
 
   if (errors.length) {
-    return res.send({
+    return res.status(400).send({
       errors: errors.map((error) => error.error.message),
     });
   }
@@ -51,7 +51,7 @@ export const DELETE = async (req: MedusaRequest<LinkBrandToProductType>, res: Me
   });
 
   if (errors.length) {
-    return res.send({
+    return res.status(400).send({
       errors: errors.map((error) => error.error.message),
     });
   }
