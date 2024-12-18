@@ -1,6 +1,7 @@
 import { SingleColumnLayout } from '../../../../layouts/single-column';
 import QueryClientProvider from '../../../../providers/query-client-provider';
 import BrandDetailContainer from '../brand-detail-container';
+import BrandProductsContainer from '../brand-products-container';
 import BrandFormDrawer from './brand-form-drawer';
 import { defineRouteConfig } from '@medusajs/admin-sdk';
 import { TagSolid } from '@medusajs/icons';
@@ -13,6 +14,7 @@ const BrandsPage = () => {
     <QueryClientProvider>
       <SingleColumnLayout>
         <BrandDetailContainer id={id} />
+        <BrandProductsContainer id={id} />
         <BrandFormDrawer id={id} />
       </SingleColumnLayout>
     </QueryClientProvider>
