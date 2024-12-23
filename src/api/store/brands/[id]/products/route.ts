@@ -26,7 +26,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   });
 
   res.json({
-    products: brand.products,
+    products: brand?.products || [],
     count: metadata.count,
     limit,
     page,
